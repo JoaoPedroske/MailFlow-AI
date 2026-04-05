@@ -1,0 +1,124 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "53c5c76d-7195-49d8-9648-2547868cf753",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "zAFNIXmfUGanbQHy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Você é um assistente de email. Leia o email abaixo e:\n1. Classifique o assunto\n2. Faça um resumo curto\n3. Escreva uma resposta profissional\n\nAssunto: {{ $('Gmail Trigger').item.json.subject }}\nDe: {{ $('Gmail Trigger').item.json.from }}\nMensagem: {{ $('Gmail Trigger').item.json.text }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "2bf53e0d-cf28-42b6-a9eb-745a09f4079d",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "xUQgHLvQEQMlyR24",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "f07b5ec6-aa40-4f28-9e32-0ec902dc3ee2",
+      "name": "Reply to a message",
+      "webhookId": "f5a16027-9d99-497a-b1e5-20612abb5e8d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "zAFNIXmfUGanbQHy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "dea08832-e73a-4fef-aa9c-37e7baa5aec9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "73278b622c4b072943414a2c7eb6850b5bb4c501ed978e83da694edab81b0d08"
+  },
+  "id": "wLB6MIpC41wb7lsu",
+  "tags": []
+}
